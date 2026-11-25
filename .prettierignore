@@ -1,0 +1,10 @@
+# Ignora a pasta de dependências
+node_modules
+
+# Ignora a pasta de build do Next.js
+.next
+
+# Ignora arquivos de lock de gerenciadores de pacotes
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
