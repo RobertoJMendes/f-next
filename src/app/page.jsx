@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Grid from "./Grid";
 
 // URL base da API do backend
-const API_URL = "http://localhost:4000";
+/*const API_URL = "http://localhost:4000";*/
+const API_URL = "/api/users";
 
 export default function Home() {
   // Estados principais de controle da aplicação
