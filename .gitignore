@@ -2,6 +2,12 @@
 # outros
 eslint-prettier.md
 git.md
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+
 # dependencies
 /node_modules
 /.pnp
