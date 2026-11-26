@@ -14,30 +14,42 @@ test.describe('Validação de Produção - f-props', () => {
   });
 
   test('deve realizar o CRUD completo na API /api/users (MySQL)', async ({ request }) => {
-    // 1. Criar usuário (POST)
+    const uniqueEmail = `teste.${Date.now()}@exemplo.com`;
+
+    // 1. Criar usuário (POST) - Enviando nome, email e fone conforme exigido pela API
     const createRes = await request.post('/api/users', {
       data: {
-        name: 'Usuário Teste Playwright',
-        email: `teste.${Date.now()}@exemplo.com` // E-mail único para evitar erro de duplicidade
+        nome: 'Usuário Teste Playwright',
+        email: uniqueEmail,
+        fone: '11999999999'
       }
     });
-    expect(createRes.ok()).toBeTruthy();
-
-    console.log(createRes)
+    expect(createRes.status()).toBe(201);
     
     const createdUser = await createRes.json();
+    expect(createdUser.id).toBeDefined();
 
-    // 2. Listar usuários (GET)
+    // 2. Listar usuários (GET) - Acessando a propriedade resultFinal retornada pela API
     const listRes = await request.get('/api/users');
     expect(listRes.status()).toBe(200);
-    const users = await listRes.json();
-    expect(Array.isArray(users)).toBeTruthy();
+    
+    const listBody = await listRes.json();
+    expect(Array.isArray(listBody.resultFinal)).toBeTruthy();
+    expect(listBody.resultFinal.some((user) => user.id === createdUser.id)).toBeTruthy();
 
-    // 3. Deletar o usuário de teste para manter o banco limpo (se a rota DELETE existir)
-    if (createdUser.id) {
-      const deleteRes = await request.delete(`/api/users/${createdUser.id}`);
-      expect(deleteRes.ok()).toBeTruthy();
-    }
+    // 3. Atualizar usuário (PUT) - Testando a rota dinâmica /api/users/[id]
+    const updateRes = await request.put(`/api/users/${createdUser.id}`, {
+      data: {
+        nome: 'Usuário Teste Atualizado',
+        email: uniqueEmail,
+        fone: '11888888888'
+      }
+    });
+    expect(updateRes.status()).toBe(200);
+
+    // 4. Deletar o usuário de teste para manter o banco limpo (DELETE)
+    const deleteRes = await request.delete(`/api/users/${createdUser.id}`);
+    expect(deleteRes.status()).toBe(200);
   });
 
 });

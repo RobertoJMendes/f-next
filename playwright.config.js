@@ -14,7 +14,9 @@ export default defineConfig({
   fullyParallel: false,
 
   // Gera um relatório visual em HTML ao final da execução dos testes
-  reporter: 'html',
+  /*reporter: 'html',*/
+  reporter: [['html', { open: 'never' }]],
+
 
   // Configurações padrão aplicadas a todos os testes
   use: {
