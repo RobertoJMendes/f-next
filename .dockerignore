@@ -1,0 +1,20 @@
+# Ignora dependências e builds locais (serão gerados limpos dentro do Linux do container)
+node_modules
+.next
+
+# Ignora histórico e configurações do Git
+.git
+.gitignore
+
+# Ignora variáveis de ambiente locais (mantém apenas o .env.example se necessário)
+.env
+.env.*
+!.env.example
+
+# Ignora arquivos de testes automatizados e relatórios do Playwright
+tests
+playwright-report
+test-results
+
+# Ignora documentação
+README.md

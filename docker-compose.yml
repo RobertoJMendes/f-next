@@ -1,0 +1,53 @@
+services:
+  # ============================================================================
+  # SERVIÇO 1: Banco de Dados MySQL
+  # ============================================================================
+  db:
+    image: mysql:8.0
+    container_name: fprops-mysql
+    # Reinicia automaticamente caso ocorra falha, exceto se você parar manualmente
+    restart: unless-stopped
+    environment:
+      # Lê as credenciais do arquivo .env na raiz do projeto
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      # Mapeia <porta_do_seu_pc>:<porta_interna_do_container> (padrão 8080 -> 3306)
+      - "${MYSQL_PORT:-8080}:3306"
+    volumes:
+      # Salva os dados do banco em um volume persistente para não perder ao reiniciar
+      - mysql_data:/var/lib/mysql
+      # Executa o script SQL automaticamente apenas na primeira criação do banco (ro = somente leitura)
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      # Verifica se o MySQL já aceita conexões antes de liberar o início do Next.js
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # ============================================================================
+  # SERVIÇO 2: Aplicação Front-end e API (Next.js)
+  # ============================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fprops-next
+    restart: unless-stopped
+    ports:
+      # Expõe a aplicação web em http://localhost:3000
+      - "3000:3000"
+    environment:
+      # Monta a URL de conexão apontando para o host 'db' (nome do serviço MySQL acima)
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@db:3306/${MYSQL_DATABASE}
+      DB_TABLE: ${DB_TABLE:-usuarios}
+    depends_on:
+      # Garante que o container 'app' só suba depois que o 'db' passar no healthcheck
+      db:
+        condition: service_healthy
+
+# Declaração do volume gerenciado pelo Docker para persistência dos dados do MySQL
+volumes:
+  mysql_data:
