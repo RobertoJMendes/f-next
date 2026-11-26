@@ -7,11 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "e2e": "playwright test",
+    "ui": "playwright test --ui"
   },
   "dependencies": {
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.10"
   }
 }
